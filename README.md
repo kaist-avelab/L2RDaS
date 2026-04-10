@@ -1,4 +1,4 @@
-# L2RDaS: LiDAR-to-Radar Data Synthesis Framework for 4D Radar
+# L2RDaS: LiDAR-to-Radar Synthesis for Building Large-Scale Tensor Datasets
 
 L2RDaS is a novel framework designed to synthesize high-fidelity 4D radar tensors (C-RAE) from LiDAR point clouds. It addresses the critical challenges of data scarcity, providing a robust data augmentation solution for downstream 3D object detection tasks.
 
