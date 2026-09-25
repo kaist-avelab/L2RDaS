@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use L2RDaS, please cite the associated paper."
+
+title: "L2RDaS: LiDAR-to-4D Radar Data Synthesis"
+type: software
+
+authors:
+  - family-names: Jung
+    given-names: Woo-Jin
+  - family-names: Paek
+    given-names: Dong-Hee
+  - family-names: Kong
+    given-names: Seung-Hyun
+
+version: 1.0.0
+license: Apache-2.0
+repository-code: "https://github.com/kaist-avelab/L2RDaS"
+
+preferred-citation:
+  type: conference-paper
+  title: "LiDAR-to-4D Radar Synthesis for Building Large-Scale Tensor Datasets"
+  authors:
+    - family-names: Jung
+      given-names: Woo-Jin
+    - family-names: Paek
+      given-names: Dong-Hee
+    - family-names: Kong
+      given-names: Seung-Hyun
+  collection-title: "Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition"
+  year: 2026
+  start: 889
+  end: 899
+  url: "https://openaccess.thecvf.com/content/CVPR2026F/html/Jung_LiDAR-to-4D_Radar_Synthesis_for_Building_Large-Scale_Tensor_Datasets_CVPRF_2026_paper.html"

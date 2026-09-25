@@ -1,0 +1,6 @@
+L2RDaS
+Copyright 2025-2026 AVELab, KAIST.
+
+This distribution contains code derived from K-Radar, OpenPCDet,
+NVIDIA pix2pixHD, Rotated_IoU, and kitti-object-eval-python. Original
+license notices are retained with the corresponding components.

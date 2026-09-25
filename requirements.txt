@@ -1,0 +1,19 @@
+# Install the matching PyTorch and torchvision CUDA wheels separately first;
+# see README.md. This file records the remaining paper-era runtime stack.
+numpy<2
+scipy
+PyYAML
+Pillow
+matplotlib
+tqdm
+SharedArray
+dominate
+easydict
+tensorboard
+opencv-python==4.2.0.32
+open3d==0.15.1
+spconv-cu113
+setuptools==59.5.0
+scikit-image
+numba
+einops

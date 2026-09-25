@@ -1,0 +1,39 @@
+# Local datasets, generated data, and logs
+/data/K-Radar/
+/data/KITTI/
+/data/nuScenes/
+/data/Dual-Radar/
+/data/View-of-Delft/
+/data/cache/
+/pkl/
+/output/
+/logs/
+/vis_image/
+/video/
+
+# Machine-local config copies
+/configs/local/
+
+# Publish these checkpoint files through GitHub Releases or Git LFS.
+/checkpoints/*.pth
+/checkpoints/*.pt
+!/checkpoints/SHA256SUMS
+*.ckpt
+!/mask.pt
+
+# Python/CUDA build products
+__pycache__/
+*.py[cod]
+*.so
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+
+# Cached path indexes
+*_cache.pkl

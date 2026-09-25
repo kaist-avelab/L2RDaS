@@ -1,0 +1,359 @@
+### ----- General ----- ###
+GENERAL:
+  NAME: 'RTNH'
+  COMMENT1: '0~72, -16~16, -2~7.6'
+  COMMENT2: 'L2RDaS / RTNH setting'
+  COMMENT3: 'Multi-class (+ Bus or Truck)'
+  VERSION: '2.0'
+  SEED: 20231
+  IS_CUDA_SEED: True
+  IS_DETERMINISTIC: True
+  DEVICE: 'gpu'
+  RESUME:
+    IS_RESUME: False
+    PATH_EXP: # None
+    START_EP: # None
+    IS_COPY_LOGS: True
+
+  LOGGING:
+    IS_LOGGING: True
+    PATH_LOGGING: './logs'
+    IS_SAVE_MODEL: True
+    INTERVAL_EPOCH_MODEL: 1
+    INTERVAL_EPOCH_UTIL: 5
+### ----- General ----- ###
+
+### ----- Dataset ----- ###
+cfg_dataset_ver2: True
+DATASET:
+  NAME: 'KRadarDetection_v2_1_for_ars548'
+
+  NUM: # Total number of frames, just make this blank
+
+  # l2r training
+  l2r_mode: True #<<--[2] When training L2RDaS, set l2r_mode True-->>  1) True: Set additional detailed settings to train L2RDaS.     2) False: No additional settings for L2RDaS
+  l2r:
+    ava_seq: ['1']
+    #ava_seq: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '14', '15', '16', '17', '18', '19', '20']
+    #ava_seq: ['2', '3', '4','6','8', '9', '10', '11', '12','16', '17', '18','20']
+    #ava_seq: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '14', '15', '16', '17', '18', '19', '20', '13', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58']
+    #ava_seq : ['2', '3', '4', '9', '10', '11', '12'] #highway
+    # ava_seq : ['7' '19'] #allway
+    #ava_seq: ['2', '3', '5', '8', '9', '10', '11', '12','15', '16', '17', '20'] #urban, highway, university except allway, tunnel
+    #ava_seq: ['1', '2', '3', '4', '5', '6', '8', '9', '10', '11', '12', '15', '16', '17', '18','20']
+    # roi: [0, 76.8, -19.2, 19.2, -2, 10.8] #x, y, z roi
+    roi: [0, 76.8, -38.4, 38.4, -2, 10.8] #[0, 76.8, -19.2, 19.2, -2, 10.8] #x, y, z roi
+    roi_xyz: [0, -38.4, -2, 76.8, 38.4, 10.8]
+    resolution: 0.4
+    load_radar_fov_mask: "mask.pt" #None : save mask. else : Load
+
+  object_sample_mode: True #True   #<<-- [3] Should we use GT-Aug for LiDAR? We don't use it when training L2RDaS.  1) True: Use GT-Aug in LiDAR    2) False: Don’t use GT-Aug in LiDAR
+  object_sample:
+    file_path: "./data/K-Radar/kradar_gt_database/kradar_dbinfos_train.pkl"
+    filter_by_min_points: {
+      'Sedan' : 5,
+      'Bus or Truck' : 5,
+      # 'Bicycle': 5,
+      # 'Motorcycle' : 5,
+      # 'Pedestrian ' : 5,
+    }
+    sample_groups: {
+      'Sedan' : 0,
+      'Bus or Truck' : 0,
+    }
+    rate: 1.0
+    sample_2d : False #이미지도 object sampling에 사용할지
+    sampling_only_seq: True #When Training RTNH, TRUE!! #<-----------------!!!!!!
+    sampling_seq: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '14', '15', '16', '17', '18', '19', '20']
+    pipeline : ["pre_processor", "vfe"]
+    make_l2r_tensor : True #True   #<<--[1] Whether to create tensor data-->>  1) True: make tensor data with L2RDas      2) False: train L2RDaS
+    l2r_path : "./checkpoints/L2RDaS_G_epoch23.pth"
+    l2r_path_D : "./checkpoints/L2RDaS_D_epoch23.pth"
+    pipeline : ["pre_processor", "vfe"]
+    real_tensor_log_norm : True #for visualize, tensor normalized in log scale
+    QUANTILE_RATE: 0.07
+    # Vis : True         #True     #<-----------------!!!!!!
+  PRE_PROCESSING:
+    VER: 'v1_0'
+    SHUFFLE_POINTS: True
+    TRANSFORM_POINTS_TO_VOXELS: True
+    MAX_POINTS_PER_VOXEL: 5
+    MAX_NUMBER_OF_VOXELS: {
+      'train': 16000,
+      'test': 40000
+    }
+  VFE:
+    NAME: MaxVFE #MeanVFE
+  Vis_mode : False #For debug
+  Vis_path : "./output/visualization"
+
+  path_data:
+    list_dir_kradar: ["./data/K-Radar/sequences"]
+    split: ['./data/Dual-Radar/ImageSets/train.txt', './data/Dual-Radar/ImageSets/val.txt']
+    revised_label_v1_1: './data/K-Radar/revised_labels/v1_1'
+    revised_label_v2_0: './data/K-Radar/revised_labels/v2_0'
+    revised_label_v2_1: './data/K-Radar/revised_labels/v2_1'
+    l2r_path: './data/cache/l2r_data'
+    ars548: './data/Dual-Radar/training'
+    ars548_info: ['./data/Dual-Radar/dual_radar_infos_train.pkl', './data/Dual-Radar/dual_radar_infos_val.pkl']
+
+  label_version: 'v2_0'
+  item: {
+    'calib': True,
+    'ldr64': True,
+    'ldr128': False,
+    'rdr': False,
+    'rdr_sparse': True, #False
+    'cam': False,
+    'l2r' : True,
+    'rdr_cube' : False,
+  }
+  calib: {
+    'z_offset': 0.7
+  }
+  ldr64: {
+    'processed': False,
+    'skip_line': 13,
+    'n_attr': 9,
+    'inside_ldr64': True,
+    'calib': True,
+    'n_used': 7, # x, y, z, intensity, sedan, bus, bbox_outline
+  }
+  rdr: {
+    'cube': True,
+  }
+  rdr_sparse: {
+    'processed': True,
+    'dir': './output/ars548'
+  }
+  rdr_cube: {
+    'is_consider_roi' : True,
+    'consider_roi_order' : 'cube -> num',
+    'roi' : {
+      'z' : [-2, 10.4],
+      'y' : [-38.4, 38.], #[-19.2, 18.8],
+      'x' : [0, 76.4],
+    }, # Calculate -0.4 from original ROI
+    'bev_divide_width' : 'bin_z',
+    'IS_COUNT_MINUS_ONE_FOR_BEV' : True,
+  }
+  roi: {
+    'filter': True,
+    'xyz': [0, -38.4, -2, 76.8, 38.4, 10.8], #[0, -38.4, -2, 76.8, 38.4, 10.8], #[0.,-16.,-2.,72.,16.,7.6],
+    'keys': ['ldr64'],
+    'check_azimuth_for_rdr': True,
+    'azimuth_deg': [-53,53],
+    'grid_size': 0.4,
+    # 'voxel_size': [0.05, 0.05, 0.1], # xyz
+    'voxel_size': [0.4, 0.4, 0.4], # same resolution
+  }
+  label: { # (consider, logit_idx, rgb, bgr)
+    'calib':            True,
+    'onlyR':            False,
+    'consider_cls':     True,
+    'consider_roi':     True,
+    'remove_0_obj':     True,     #False    #<----------------------
+    'Sedan':            [True,  1,  [0, 1, 0],       [0,255,0]],
+    'Bus or Truck':     [True,  2,  [1, 0.2, 0],     [0,50,255]],
+    'Motorcycle':       [False, -1, [1, 0, 0],       [0,0,255]],
+    'Bicycle':          [False, -1, [1, 1, 0],       [0,255,255]],
+    'Bicycle Group':    [False, -1, [0, 0.5, 1],     [0,128,255]],
+    'Pedestrian':       [False, -1, [0, 0, 1],       [255,0,0]],
+    'Pedestrian Group': [False, -1, [0.4, 0, 1],     [255,0,100]],
+    'Label':            [False, -1, [0.5, 0.5, 0.5], [128,128,128]],
+  }
+  collate_fn: 'v2_0'
+  load_from_pickle: './pkl'
+### ----- Dataset ----- ###
+
+### ----- Model ----- ###
+MODEL:
+  NAME: 'RTNH'
+  SKELETON: 'RadarBase'
+
+  PRE_PROCESSOR:
+    NAME: 'RadarSparseProcessor'
+    INPUT_DIM: 4 # in [4, 5] / 5 for Doppler
+
+    SIMPLIFIED_POINTNET:
+      IS_WITH_SIMPLIFIED_POINTNET: True
+      OUT_CHANNEL: 32
+      POOLING: 'max'
+
+  BACKBONE:
+    TYPE: '3D'
+    NAME: 'RadarSparseBackbone'
+    ENCODING:
+      CHANNEL: [64, 128, 256]
+      STRIDE:  [1, 2, 2]
+      PADDING: [1, 1, 1]
+    TO_BEV:
+      IS_Z_EMBED: False
+      CHANNEL: [256, 256, 256]
+      KERNEL_SIZE: [3, 6, 12]
+      STRIDE:  [1, 2, 4]
+      PADDING: [1, 2, 4]
+
+  HEAD:
+    NAME: 'AnchorHeadSingle'
+    INPUT_CHANNELS: 768
+    CLASS_AGNOSTIC: False
+
+    USE_DIRECTION_CLASSIFIER: True
+    DIR_OFFSET: 0.78539
+    DIR_LIMIT_OFFSET: 0.0
+    NUM_DIR_BINS: 2
+
+    ANCHOR_GENERATOR_CONFIG: [
+      {
+          'class_name': 'Sedan',
+          'anchor_sizes': [[4.2, 2.1, 2.0]],
+          'anchor_rotations': [0, 1.57],
+          'anchor_bottom_heights': [-1.08],
+          'align_center': False,
+          'feature_map_stride': 1,
+          'matched_threshold': 0.5,
+          'unmatched_threshold': 0.2
+      },
+      {
+          'class_name': 'Bus or Truck',
+          'anchor_sizes': [[9.5, 3.2, 3.7]],
+          'anchor_rotations': [0, 1.57],
+          'anchor_bottom_heights': [-1.08],
+          'align_center': False,
+          'feature_map_stride': 1,
+          'matched_threshold': 0.45,
+          'unmatched_threshold': 0.15
+      },
+    ]
+
+    TARGET_ASSIGNER_CONFIG:
+      NAME: AxisAlignedTargetAssigner
+      POS_FRACTION: -1.0
+      SAMPLE_SIZE: 512
+      NORM_BY_NUM_EXAMPLES: False
+      MATCH_HEIGHT: False
+      BOX_CODER: ResidualCoder
+
+    LOSS_CONFIG:
+      LOSS_WEIGHTS: {
+          'cls_weight': 1.0,
+          'loc_weight': 2.0,
+          'dir_weight': 0.2,
+          'code_weights': [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+      }
+
+    DIM: 768
+    BOX_CODE: ['xc', 'yc', 'zc', 'xl', 'yl', 'zl', 'cos', 'sin']
+
+    POST_PROCESSING:
+      RECALL_THRESH_LIST: [0.3, 0.5, 0.7]
+      SCORE_THRESH: 0.1
+      OUTPUT_RAW_SCORE: False
+
+      EVAL_METRIC: kitti
+
+      NMS_CONFIG:
+        MULTI_CLASSES_NMS: False
+        NMS_TYPE: nms_gpu
+        NMS_THRESH: 0.01
+        NMS_PRE_MAXSIZE: 4096
+        NMS_POST_MAXSIZE: 500
+
+  ROI_HEAD:
+### ----- Model ----- ###
+
+### ----- Optimizer ----- ###
+OPTIMIZER: # Training
+  NAME: 'AdamW'
+
+  LR: 0.001
+  MIN_LR: 0.0001 # for scheduler
+  BETAS: [0.9, 0.999]
+  WEIGHT_DECAY: 0.01
+  MOMENTUM: 0.9
+
+  BATCH_SIZE: 8
+  NUM_WORKERS: 0 # 0 for dataloader_error / 4 for batch 16
+
+  MAX_EPOCH: 1
+
+  SCHEDULER: 'CosineAnnealingLR' # in [None (empty), 'LambdaLR', 'CosineAnnealingLR']
+  TYPE_TOTAL_ITER: 'every' # in ['every', 'all'] / every epoch
+### ----- Optimizer ----- ###
+
+### ----- Validation ----- ###
+cfg_eval_ver2: True
+VAL:
+  IS_VALIDATE: True
+  IS_CONSIDER_VAL_SUBSET: True
+  VAL_PER_EPOCH_SUBSET: 1
+  NUM_SUBSET: 500 # 500
+  VAL_PER_EPOCH_FULL: 31 # epoch for validate full dataset
+
+  LIST_VAL_CONF_THR: [0.3, 0.5, 0.7]
+  LIST_VAL_IOU: [0.7, 0.5, 0.3]
+  # This is for logging, change the iou threshold in 'utils/kitti_eval'
+
+  CLASS_VAL_KEYWORD: {
+    'Sedan': 'sed',
+    'Bus or Truck': 'bus',
+    'Motorcycle': 'mot',
+    'Bicycle': 'bic',
+    'Bicycle Group': 'big',
+    'Pedestrian': 'ped',
+    'Pedestrian Group': 'peg'
+  }
+
+  REGARDING: 'anchor' # in ['anchor']
+  LIST_CARE_VAL: ['Sedan', 'Bus or Truck']
+### ----- Validation ----- ###
+
+### ----- Visualization ----- ###
+VIS:
+  # OpenCV
+  CLASS_BGR: {
+    'Sedan': [0,255,0],
+    'Bus or Truck': [0,50,255],
+    'Motorcycle': [0,0,255],
+    'Bicycle': [0,255,255],
+    'Pedestrian': [255,0,0],
+    'Pedestrian Group': [255,0,100],
+    'Label': [128,128,128]
+  }
+
+  # Open3D
+  CLASS_RGB: {
+    'Sedan': [0, 1, 0],
+    'Bus or Truck': [1, 0.2, 0],
+    'Motorcycle': [1, 0, 0],
+    'Bicycle': [1, 1, 0],
+    'Pedestrian': [0, 0, 1],
+    'Pedestrian Group': [0.4, 0, 1],
+    'Label': [0.5, 0.5, 0.5]
+  }
+
+  ROI:
+    TYPE: 'default' # ['default', 'cube']
+    DEFAULT: [0,100,-40,40,-10,60] # x_min_max, y_min_max, z_min_max / Dim: [m]
+
+  # For BEV model visualization
+  Z_CENTER: {
+    'Sedan': 0.5,
+    'Bus or Truck': 1.5,
+    'Motorcycle': 0.5,
+    'Bicycle': 0.5,
+    'Pedestrian': 0.5,
+    'Pedestrian Group': 0.5,
+  }
+
+  # For BEV model visualization
+  Z_HEIGHT: {
+    'Sedan': 1.9,
+    'Bus or Truck': 1.9,
+    'Motorcycle': -1,
+    'Bicycle': -1,
+    'Pedestrian': 2,
+    'Pedestrian Group': -1,
+  }
+### ----- Visualization ----- ###
