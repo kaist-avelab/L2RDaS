@@ -19,6 +19,8 @@
 /checkpoints/*.pt
 !/checkpoints/SHA256SUMS
 *.ckpt
+
+# Keep the radar FOV mask in the repository.
 !/mask.pt
 
 # Python/CUDA build products
@@ -29,6 +31,16 @@ build/
 dist/
 *.egg-info/
 .pytest_cache/
+.ipynb_checkpoints/
+
+# Local environments and secrets
+.env
+.env.*
+.venv/
+venv/
+
+# Experiment tracking
+wandb/
 
 # Editors and operating systems
 .vscode/
